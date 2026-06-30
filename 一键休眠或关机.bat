@@ -17,9 +17,11 @@ echo   [4] Shutdown in 1 hour
 echo   [5] Restart computer
 echo   [6] Cancel scheduled shutdown
 echo   [7] Hibernate
-echo   [8] Exit
+echo   [8] Sleep
+echo   [9] Lock screen
+echo   [0] Exit
 echo.
-set /p choice=Enter your choice (1-8): 
+set /p choice=Enter your choice (0-9):
 
 if "%choice%"=="1" goto shutdown_now
 if "%choice%"=="2" goto shutdown_10min
@@ -28,7 +30,9 @@ if "%choice%"=="4" goto shutdown_1hour
 if "%choice%"=="5" goto restart
 if "%choice%"=="6" goto cancel
 if "%choice%"=="7" goto hibernate
-if "%choice%"=="8" exit
+if "%choice%"=="8" goto sleep
+if "%choice%"=="9" goto lock
+if "%choice%"=="0" exit
 
 echo Invalid choice, please press any key to try again...
 pause >nul
@@ -100,3 +104,23 @@ if %errorlevel% equ 1 (
     pause
     goto menu
 )
+
+:sleep
+echo.
+choice /c YN /n /m "Are you sure you want to sleep? (Y/N)"
+if %errorlevel% equ 1 (
+    echo Going to sleep...
+    rem Note: if hibernation is enabled, this may hibernate instead of sleep.
+    rundll32.exe powrprof.dll,SetSuspendState 0,1,0
+    goto menu
+) else (
+    echo Operation cancelled.
+    pause
+    goto menu
+)
+
+:lock
+echo.
+echo Locking screen...
+rundll32.exe user32.dll,LockWorkStation
+goto menu
